@@ -1,0 +1,62 @@
+{
+  "category": "structural_damage",
+  "version": "1.0",
+  "source": "IFRC Emergency Field Manual / UNDAC Structural Assessment Guidelines",
+  "actions": [
+    {
+      "id": "struct_001",
+      "priority": 1,
+      "tags": ["evacuation", "immediate", "life-safety"],
+      "translations": {
+        "en": "Establish a 10-metre exclusion zone around the damaged structure. Remove all persons immediately.",
+        "bi": "Mekem eksklusion zon blong 10 mita araon long bilding we hemi damaged. Tekemaot olgeta man naoia.",
+        "tpi": "Mekim eksklusion zon 10 mita raun long bilding i bagarap. Rausim olgeta man nau.",
+        "ht": "Etabli yon zòn eksklizyon 10 mèt alantou estrikti a ki domaje. Retire tout moun imedyatman."
+      }
+    },
+    {
+      "id": "struct_002",
+      "priority": 1,
+      "tags": ["search-rescue", "immediate"],
+      "translations": {
+        "en": "Listen and call out for trapped survivors before entering any collapsed section.",
+        "bi": "Harim mo singaot blong sek sapos gat man we oli stuk insaed bifo yu go insaed long eni pati we hemi foldaon.",
+        "tpi": "Harim na singaut bilong painim ol man i stap hait insait bifo yu go insait long pes i pundaun.",
+        "ht": "Koute epi rele pou sivivan ki bloke anvan ou antre nan nenpòt seksyon ki te efondre."
+      }
+    },
+    {
+      "id": "struct_003",
+      "priority": 2,
+      "tags": ["assessment", "engineering"],
+      "translations": {
+        "en": "Photograph all four sides of the structure. Note visible cracks, leaning walls, or roof collapse before any entry.",
+        "bi": "Tekem foto blong olgeta fo saed blong bilding. Naot olgeta krak, wol we emi lean, oa ruf we hemi foldaon bifo entri.",
+        "tpi": "Kisim piksa bilong ol 4 het bilong bilding. Naotim ol krak, wol i lin, o ruf i pundaun bifo yu go insait.",
+        "ht": "Pran foto kat kote estrikti a. Note fissure vizib, mi ki penche, oswa effondrement twa anvan nenpòt antre."
+      }
+    },
+    {
+      "id": "struct_004",
+      "priority": 2,
+      "tags": ["utility-hazards", "safety"],
+      "translations": {
+        "en": "Locate and shut off utilities: gas, electricity, water. Do not use open flame near damaged structure.",
+        "bi": "Faenemaot mo katem of olgeta utility: gas, elektrisiti, wota. No yusum open flam klosap long bilding we hemi damaged.",
+        "tpi": "Painim na katim ol utility: gas, kakaruk, wara. No yusum open paia klostu long bilding i bagarap.",
+        "ht": "Locate epi ferme sèvis piblik: gaz, elektrisite, dlo. Pa itilize flanm louvri pre estrikti domaje."
+      }
+    },
+    {
+      "id": "struct_005",
+      "priority": 3,
+      "tags": ["documentation", "coordination"],
+      "translations": {
+        "en": "Mark structure with standardized INSARAG color code: Green (safe), Yellow (restricted use), Red (unsafe — do not enter).",
+        "bi": "Makem bilding wetem INSARAG kola kod: Grin (sefti), Yelo (restrikted yus), Red (no sef — no go insaed).",
+        "tpi": "Makim bilding long INSARAG kala kod: Grin (sef), Yelo (yusim liklik tasol), Ret (no sef — no go insait).",
+        "ht": "Make estrikti a ak kòd koulè INSARAG: Vèt (an sekirite), Jòn (itilizasyon restrenn), Wouj (pa an sekirite — pa antre)."
+      }
+    }
+  ]
+}

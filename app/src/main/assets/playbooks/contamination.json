@@ -1,0 +1,62 @@
+{
+  "category": "contamination",
+  "version": "1.0",
+  "source": "WHO Water Safety in Emergencies / IFRC Cholera Response Toolkit",
+  "actions": [
+    {
+      "id": "contam_001",
+      "priority": 1,
+      "tags": ["water-safety", "immediate", "life-safety"],
+      "translations": {
+        "en": "Stop use of all local water sources immediately. Do not drink, cook with, or bathe in potentially contaminated water.",
+        "bi": "Stopem yus blong olgeta local wota naoia. No dring, no kukim witem, no betem bodi long wota we hemi posibli contaminated.",
+        "tpi": "Stopim yusim olgeta wara bilong ples nau. No dring, no kukim, no wasim bodi long wara i ken bagarap.",
+        "ht": "Sispann itilize tout sous dlo lokal imedyatman. Pa bwè, kwit, oswa benyen nan dlo ki posibleman kontamine."
+      }
+    },
+    {
+      "id": "contam_002",
+      "priority": 1,
+      "tags": ["water-treatment", "immediate"],
+      "translations": {
+        "en": "Distribute water purification tablets (1 tablet per 1L). Boil water for at least 1 minute if tablets unavailable.",
+        "bi": "Givim wota purification tablets (1 tablet long 1L). Boilem wota blong wan minit olsem les sapos no gat tablets.",
+        "tpi": "Givim wara purification tablets (1 tablet long 1L). Boilim wara bilong 1 minit o moa sapos no gat tablets.",
+        "ht": "Distribye tablèt pou purifye dlo (1 tablèt pou 1L). Fè bouyi dlo pou omwen 1 minit si pa gen tablèt disponib."
+      }
+    },
+    {
+      "id": "contam_003",
+      "priority": 1,
+      "tags": ["disease-surveillance", "health-alert"],
+      "translations": {
+        "en": "Identify and isolate any persons showing symptoms: diarrhea, vomiting, fever. Report to health coordinator immediately.",
+        "bi": "Faenemaot mo separetem eni man we hemi sik: diarrhea, vomiting, fiva. Reportem long health coordinator naoia.",
+        "tpi": "Painim na separetem eni man i sik: diarrhea, tokim, fiva. Reportim long health coordinator nau.",
+        "ht": "Idantifye epi izole nenpòt moun ki montre sentòm: dyare, vomisman, lafyèv. Rapòte bay kòdonatè sante a imedyatman."
+      }
+    },
+    {
+      "id": "contam_004",
+      "priority": 2,
+      "tags": ["hygiene", "prevention"],
+      "translations": {
+        "en": "Establish handwashing stations with soap or alcohol-based sanitizer at all food preparation and latrine sites.",
+        "bi": "Mekem handwashing stesen wetem sop oa sanitizer long olgeta ples blong kukim kakae mo toilet.",
+        "tpi": "Mekim ol ples bilong wasim han long sop o sanitizer long olgeta ples bilong kukim kaikai na toilet.",
+        "ht": "Etabli estasyon lavaj men ak savon oswa dezenfektan à base d'alkòl nan tout sit preparasyon manje ak latrinn."
+      }
+    },
+    {
+      "id": "contam_005",
+      "priority": 2,
+      "tags": ["documentation", "sampling"],
+      "translations": {
+        "en": "Collect a water sample in a sealed container for lab testing when health team arrives. Mark with GPS coordinates and time.",
+        "bi": "Kolek wota sample insaed long sealed kontena blong lab test taem health tim i kambak. Makem wetem GPS koodinet mo taem.",
+        "tpi": "Kisim wara sample insait long sealed kontena bilong lab test taem helth tim i kam. Makim long GPS na taim.",
+        "ht": "Kolekte yon echantiyon dlo nan yon konteyè sele pou tès laboratwa lè ekip sante a rive. Make ak kòdone GPS ak lè."
+      }
+    }
+  ]
+}

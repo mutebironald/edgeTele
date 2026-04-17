@@ -1,0 +1,62 @@
+{
+  "category": "injury",
+  "version": "1.0",
+  "source": "WHO Basic Emergency Care / IFRC First Aid Guidelines",
+  "actions": [
+    {
+      "id": "injury_001",
+      "priority": 1,
+      "tags": ["triage", "immediate", "life-safety"],
+      "translations": {
+        "en": "Perform triage: sort casualties by severity. Priority: breathing problems, severe bleeding, shock. Move life-threatening cases first.",
+        "bi": "Mekem triage: sotem olgeta man blong sik wetem severity. Fastaem: problem blong bret, blad we hemi no stop, sok. Muv olgeta keis we oli denjeres fastaem.",
+        "tpi": "Mekim triage: sotim olgeta man long sik olsem severity. Pastaim: hevi win, bikpela blut, sok. Muv ol keis i denja pastaim.",
+        "ht": "Fè triage: triye viktim yo pa gravite. Priyorite: pwoblèm respirasyon, senyen sevè, chòk. Deplase ka ki mete lavi an danje yo an premye."
+      }
+    },
+    {
+      "id": "injury_002",
+      "priority": 1,
+      "tags": ["bleeding-control", "immediate"],
+      "translations": {
+        "en": "Apply direct pressure to severe bleeding wounds. Do not remove pressure. Elevate limb if no fracture suspected.",
+        "bi": "Pressing strong long wound we hemi blad hard. No tekemaot handes. Levetem arm oa leg sapos no gat fraksa.",
+        "tpi": "Presim strong long wound i blut hard. No rausim han. Lifim han o leg sapos yu ting no gat breakbone.",
+        "ht": "Aplike presyon dirèk sou blesi ki senyen grav. Pa retire presyon an. Eleve manm si pa gen frakti sipoze."
+      }
+    },
+    {
+      "id": "injury_003",
+      "priority": 1,
+      "tags": ["airway", "immediate", "cpr"],
+      "translations": {
+        "en": "If victim is unresponsive and not breathing normally, begin CPR if trained. Call for trained medical personnel immediately.",
+        "bi": "Sapos victim hemi no respond mo hemi no bret olsem normal, statem CPR sapos yu trained. Singaot long trained medical staff naoia.",
+        "tpi": "Sapos victim i no tok na i no win rait, kirapim CPR sapos yu trained. Singaut long ol dokta trained nau.",
+        "ht": "Si viktim pa reponn epi pa respire nòmalman, kòmanse CPR si ou fòme pou sa. Rele pèsonèl medikal fòme imedyatman."
+      }
+    },
+    {
+      "id": "injury_004",
+      "priority": 2,
+      "tags": ["immobilization", "fracture"],
+      "translations": {
+        "en": "Immobilize suspected fractures using available materials. Do not attempt to straighten deformed limbs.",
+        "bi": "Faesem eni saspekted fraksa wetem ol material we oli save. No traem blong stretem leg oa arm we hemi bented.",
+        "tpi": "Pasim eni fraksa ol man i ting long ol samting i stap. No traim stretim leg o han i bin.",
+        "ht": "Inobilize frakti sipoze yo ak materyèl ki disponib. Pa eseye redrese manm defòme yo."
+      }
+    },
+    {
+      "id": "injury_005",
+      "priority": 2,
+      "tags": ["evacuation", "medical-transport"],
+      "translations": {
+        "en": "Document number of casualties by severity level. Request medical evacuation transport for critical cases.",
+        "bi": "Raetedown namba blong ol man we oli hurt wetem severity level. Askem transport blong medevac long ol keis we oli kritikol.",
+        "tpi": "Raitim namba bilong olgeta man long ol leta bilong sik. Askim medevac transport long ol keis i hevi."
+      , "ht": "Dokimante kantite viktim pa nivo gravite. Mande transpò evakiyasyon medikal pou ka kritik yo."
+      }
+    }
+  ]
+}

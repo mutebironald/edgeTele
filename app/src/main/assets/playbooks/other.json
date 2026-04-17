@@ -1,0 +1,40 @@
+{
+  "category": "other",
+  "version": "1.0",
+  "source": "IFRC General Emergency Response Guidelines",
+  "actions": [
+    {
+      "id": "other_001",
+      "priority": 1,
+      "tags": ["assessment", "documentation"],
+      "translations": {
+        "en": "Document the situation with photos from multiple angles. Record location, time, and number of people affected.",
+        "bi": "Dokumentem situation wetem foto long different saed. Rekod ples, taem, mo namba blong man we oli afekted.",
+        "tpi": "Raitim situation wetem piksa long ol kain ples. Raitim ples, taim, na namba bilong manmeri i afektim.",
+        "ht": "Dokimante sitiyasyon an ak foto soti nan plizyè ang. Anrejistre kote, lè, ak kantite moun ki afekte."
+      }
+    },
+    {
+      "id": "other_002",
+      "priority": 2,
+      "tags": ["reporting", "coordination"],
+      "translations": {
+        "en": "Report to coordination center with all available details. Await further instructions from emergency coordinator.",
+        "bi": "Reportem long koordinasen senta wetem olgeta informesen. Wet long moa instraksens from koordineta.",
+        "tpi": "Ripotim long koordinesen senta long ol samting yu save. Wet long moa toktok bilong koordineta.",
+        "ht": "Rapòte nan sant kòdinasyon an ak tout detay disponib. Tann enstriksyon anplis nan kòdonatè ijans lan."
+      }
+    },
+    {
+      "id": "other_003",
+      "priority": 3,
+      "tags": ["safety", "standby"],
+      "translations": {
+        "en": "Ensure your own safety first. Do not enter any area that appears unstable or hazardous without proper equipment.",
+        "bi": "Mekem sua fastaem se yu seif. No go insaed long eni eria we hemi luk unstable oa denjeres without proper equipment.",
+        "tpi": "Lukautim yu yet pastaim. No go insait long eni ples i luk no sef o denja without rait ekwipmen.",
+        "ht": "Asire sekirite pwòp ou an an premye. Pa antre nan nenpòt zòn ki parèt enstab oswa danjere san ekipman apwopriye."
+      }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "category": "flood_damage",
+  "version": "1.0",
+  "source": "IFRC Emergency Field Manual / WHO Flood Response Guidelines",
+  "actions": [
+    {
+      "id": "flood_001",
+      "priority": 1,
+      "tags": ["evacuation", "immediate", "life-safety"],
+      "translations": {
+        "en": "Evacuate all occupants to highest available ground immediately. Do not wait for water to recede.",
+        "bi": "Tekemaot olgeta man long haus, kaem go antap long haes graon naoia. No wet wota i go daon fastaem.",
+        "tpi": "Kisim olgeta man i go antap long graun hait nau. No wet bilong wara i go daon pastaim.",
+        "ht": "Evakye tout moun nan lokal la nan zòn ki pi wo a imedyatman. Pa tann dlo a desann."
+      }
+    },
+    {
+      "id": "flood_002",
+      "priority": 1,
+      "tags": ["rescue", "immediate", "water-rescue"],
+      "translations": {
+        "en": "Request watercraft or rope-assisted rescue for anyone stranded above flood level.",
+        "bi": "Askem bot oa rop risket long ol man we oli stuk antap long wota.",
+        "tpi": "Askim bot o rop i helpim ol man i stap antap long wara.",
+        "ht": "Mande bato oswa sekou ak kòd pou moun ki rèste bloke anlè nivo dlo a."
+      }
+    },
+    {
+      "id": "flood_003",
+      "priority": 2,
+      "tags": ["water-safety", "contamination-risk", "health"],
+      "translations": {
+        "en": "Flag this location for cholera and waterborne disease risk assessment within 24 hours.",
+        "bi": "Makem ples ia blong risk assessment blong kolera mo sik blong wota insaed long 24 haos.",
+        "tpi": "Makim dispela ples long risk assessment bilong kolera na sik bilong wara insait long 24 aua.",
+        "ht": "Make kote sa a pou evalyasyon risk kolera ak maladi ki transmèt pa dlo nan 24 èdtan."
+      }
+    },
+    {
+      "id": "flood_004",
+      "priority": 2,
+      "tags": ["documentation", "coordination"],
+      "translations": {
+        "en": "Count and record number of households affected. Note any vulnerable groups: elderly, children under 5, pregnant women.",
+        "bi": "Kaontem mo raetedown namba blong haos we oli afekted. Tingting long ol vulnerable gru: ol man we oli olfala, ol pikinini andaset faef yia, ol woman we oli gat bel.",
+        "tpi": "Kauntim na raitim namba bilong haus i afektim. Luksave long ol grup i winim: ol lapun, ol pikinini aninit long 5 yia, ol meri i gat bel.",
+        "ht": "Konte epi anrejistre kantite kay ki afekte. Note nenpòt gwoup vilnerab: granmoun, timoun anba 5 an, fanm ansent."
+      }
+    },
+    {
+      "id": "flood_005",
+      "priority": 3,
+      "tags": ["shelter", "immediate-needs"],
+      "translations": {
+        "en": "Identify nearest dry shelter location. Confirm capacity can accommodate all evacuees.",
+        "bi": "Faenemaot klosestaem plaes blong draea shelter. Mekem sua we hemi save holem olgeta man we oli kambak.",
+        "tpi": "Painim klostu ples i drai bilong shelter. Konfomim olsem ples inap holim olgeta manmeri i kam.",
+        "ht": "Idantifye kote abri sèk ki pi pre a. Konfime kapasite ka akomode tout moun ki evacye."
+      }
+    }
+  ]
+}

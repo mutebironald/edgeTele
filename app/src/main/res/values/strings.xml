@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Edge-Tele</string>
+    <string name="decision_support_label">Decision support for trained responders</string>
+    <string name="expert_confirmation_yellow">Low confidence — seek expert confirmation before acting</string>
+    <string name="expert_confirmation_red">Very low confidence — do not act without expert review</string>
+    <string name="offline_mode_label">Offline mode active</string>
+    <string name="sync_pending_label">Sync pending</string>
+</resources>
