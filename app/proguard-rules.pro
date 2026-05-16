@@ -7,7 +7,8 @@
 -dontwarn org.tensorflow.lite.gpu.**
 -keep class org.tensorflow.lite.gpu.** { *; }
 
-# MediaPipe
+# MediaPipe — proto classes are referenced but not bundled in the AAR
+-dontwarn com.google.mediapipe.**
 -keep class com.google.mediapipe.** { *; }
 
 # Hilt
