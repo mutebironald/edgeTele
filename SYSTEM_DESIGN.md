@@ -24,7 +24,7 @@ Version 1.0 | April 2026 | Gemma 4 Good Hackathon
 │                      ▼                                   │
 │          ┌───────────────────────┐                       │
 │          │   GemmaInferenceEngine│                       │
-│          │   (LiteRT-LM, E2B)    │                       │
+│          │   (LiteRT-LM, E4B)    │                       │
 │          │   <1.5 GB RAM         │                       │
 │          └───────────┬───────────┘                       │
 │                      │                                   │
@@ -36,7 +36,7 @@ Version 1.0 | April 2026 | Gemma 4 Good Hackathon
 │          └───────────┬───────────┘                       │
 │                      │                                   │
 │          ┌───────────▼───────────┐                       │
-│          │    PlaybookMatcher    │                       │
+│          │   PlaybookRepository  │                       │
 │          │  (local JSON cache)   │                       │
 │          └───────────┬───────────┘                       │
 │                      │                                   │
@@ -116,12 +116,12 @@ Functions:
 ─────────────────────────────────────────────────────────
 ```
 
-### 2.3 PlaybookMatcher
+### 2.3 PlaybookRepository
 
 Reads from local JSON asset files. Never hits the network.
 
 ```
-Interface: PlaybookMatcher
+Class: PlaybookRepository
 ─────────────────────────────────────────────────────────
 Input:
   category     IncidentCategory
@@ -378,7 +378,6 @@ app/src/main/
 │   │   │   ├── Incident.kt      Room entity
 │   │   │   ├── ClassificationResult.kt
 │   │   │   ├── PlaybookAction.kt
-│   │   │   ├── SyncPacket.kt
 │   │   │   └── enums/
 │   │   │       ├── IncidentCategory.kt
 │   │   │       ├── Language.kt
@@ -391,18 +390,18 @@ app/src/main/
 │   │       ├── IncidentRepository.kt
 │   │       └── PlaybookRepository.kt
 │   ├── ai/
-│   │   ├── GemmaInferenceEngine.kt  (interface)
-│   │   ├── GemmaInferenceEngineImpl.kt (LiteRT-LM impl)
+│   │   ├── GemmaInferenceEngine.kt         (interface)
+│   │   ├── GemmaInferenceEngineImpl.kt     (LiteRT-LM / on-device impl)
+│   │   ├── GemmaApiInferenceEngineImpl.kt  (Gemini API fallback impl)
 │   │   ├── ConfidenceGate.kt
-│   │   └── PlaybookMatcher.kt
+│   │   └── ModelInstaller.kt
 │   ├── audio/
 │   │   └── SpeechRecognitionManager.kt
 │   ├── sync/
 │   │   ├── SyncPacketGenerator.kt
 │   │   └── SyncUploader.kt
 │   ├── di/
-│   │   ├── AppModule.kt
-│   │   └── AiModule.kt
+│   │   └── AppModule.kt
 │   └── ui/
 │       ├── theme/
 │       │   └── Theme.kt
@@ -432,6 +431,13 @@ app/src/main/
         ├── injury.json
         ├── contamination.json
         └── other.json
+
+app/src/debug/kotlin/com/dimaggi/edgetele/
+├── ai/MockGemmaInferenceEngineImpl.kt   (debug-only mock, no model file needed)
+└── di/AiModule.kt                       (binds Mock impl)
+
+app/src/release/kotlin/com/dimaggi/edgetele/
+└── di/AiModule.kt                       (binds real GemmaInferenceEngineImpl)
 ```
 
 ---
@@ -441,6 +447,6 @@ app/src/main/
 1. **No network calls during inference**. GemmaInferenceEngine must be callable with airplane mode on.
 2. **Every ClassificationResult must pass through ConfidenceGate** before reaching the UI layer.
 3. **Every recommendation screen must render DecisionSupportWatermark**. No exceptions.
-4. **PlaybookMatcher reads only from assets/**. No dynamic download of playbooks at runtime.
+4. **PlaybookRepository reads only from assets/**. No dynamic download of playbooks at runtime.
 5. **SyncPackets are never deleted automatically**. Only a manual authorized-user clear action removes them.
 6. **Graceful degradation**: if GemmaInferenceEngine throws, fall back to structured form capture (no AI, just data collection).

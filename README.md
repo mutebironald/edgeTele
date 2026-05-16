@@ -81,7 +81,7 @@ Each category has a bundled playbook at `assets/playbooks/{category}.json` with 
 
 **Debug** — uses `MockGemmaInferenceEngineImpl`, no LiteRT/MediaPipe dependency needed. Lets you build and run the full UI without the model file.
 
-**Release** — uses `GemmaInferenceEngineImpl` backed by MediaPipe Tasks GenAI and the LiteRT GPU delegate. Requires the Gemma 4 E4B model file on-device. Falls back to `GemmaApiInferenceEngineImpl` (Gemma 4 via cloud API) if the model file is absent; the UI shows 🌐 API Mode when this happens.
+**Release** — uses `GemmaInferenceEngineImpl` backed by MediaPipe Tasks GenAI and the LiteRT GPU delegate. Requires the Gemma 4 E4B model file on-device. Falls back to `GemmaApiInferenceEngineImpl` (Gemma 4 via cloud API) if the model file is absent; the UI shows 🌐 API Mode when this happens. R8 ProGuard rules are bundled in `app/proguard-rules.pro` to preserve MediaPipe and TFLite classes.
 
 ```bash
 # Debug build (mock AI, no model file needed)
@@ -108,11 +108,11 @@ The backend endpoint is configurable. In demo mode, export-only works with no ba
 
 ```
 app/src/main/kotlin/com/dimaggi/edgetele/
-├── ai/               GemmaInferenceEngine, ConfidenceGate, PlaybookMatcher
+├── ai/               GemmaInferenceEngine, GemmaInferenceEngineImpl, GemmaApiInferenceEngineImpl, ConfidenceGate, ModelInstaller
 ├── audio/            SpeechRecognitionManager
 ├── data/
 │   ├── db/           Room database, DAO, type converters
-│   ├── model/        Incident, ClassificationResult, SyncPacket, enums
+│   ├── model/        Incident, ClassificationResult, PlaybookAction, enums
 │   └── repository/   IncidentRepository, PlaybookRepository
 ├── di/               Hilt modules (AppModule, AiModule)
 ├── sync/             SyncPacketGenerator, SyncUploader
