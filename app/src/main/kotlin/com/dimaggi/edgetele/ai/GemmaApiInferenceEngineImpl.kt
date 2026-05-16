@@ -51,11 +51,24 @@ class GemmaApiInferenceEngineImpl @Inject constructor(
 
             Always respond with a single valid JSON object matching this exact schema:
             {
-              "category": "<one of: flood_damage, structural_damage, injury, contamination, other>",
+              "category": "<one of: injury, contamination, flood_damage, structural_damage, other>",
               "severity": <integer 1-5>,
               "confidence": <float 0.0-1.0>,
               "reasoning": "<brief 1-sentence explanation>"
             }
+
+            Category definitions — choose the single best match:
+            - injury: bodily harm to a person — wounds, broken bones, burns, fractures, sprains, unconscious person, bleeding, medical emergency
+            - contamination: a substance (water, food, air, soil) is unsafe — chemical spill, polluted water source, toxic exposure, biological hazard, nuclear or radiological hazard, hazmat incident, radiation leak
+            - flood_damage: flooding or water inundation — submerged roads, waterlogged buildings, overflowing rivers
+            - structural_damage: physical damage to buildings or infrastructure — collapsed roof, cracked walls, downed bridge, damaged roads
+            - other: does not clearly fit any category above
+
+            CRITICAL matching rules:
+            - Use injury whenever a person is physically harmed — broken bones, wounds, bleeding, burns always map here.
+            - Use contamination for any hazardous substance — nuclear material, radiation, chemicals, biohazards always map here.
+            - Use flood_damage ONLY when water flooding or inundation is explicitly described. Do NOT use it as a default.
+            - When unsure between two categories, pick the one whose definition contains the most matching words from the input.
 
             Severity scale:
             1 = Minor, no immediate risk
@@ -64,14 +77,12 @@ class GemmaApiInferenceEngineImpl @Inject constructor(
             4 = Severe, immediate intervention required
             5 = Critical, life-threatening
 
-            Confidence guidance (be accurate, not conservative):
-            0.85-1.00 = Clear, unambiguous evidence directly matches the category
-            0.65-0.84 = Strong indicators present but some details missing
-            0.40-0.64 = Mixed signals or vague input
-            0.00-0.39 = Input genuinely insufficient to classify
-
-            Most real field reports with a photo OR a description of visible damage should score 0.80+.
-            Only use low confidence (< 0.60) when the input truly cannot support a classification.
+            Confidence guidance:
+            0.85-1.00 = Input clearly and directly matches the chosen category
+            0.65-0.84 = Strong indicators present but some ambiguity
+            0.40-0.64 = Mixed signals or incomplete information
+            0.00-0.39 = Input insufficient to classify with confidence
+            Do NOT inflate confidence. A wrong answer with high confidence is worse than a low-confidence flag.
         """.trimIndent()
     }
 
@@ -133,24 +144,20 @@ class GemmaApiInferenceEngineImpl @Inject constructor(
     }
 
     /**
-     * Attempt generateContent with the current candidate. On failure, advance to the
-     * next candidate and retry, until all candidates are exhausted.
+     * Try each candidate in order per call. Resets to the primary on every invocation
+     * so a transient error on one call does not permanently skip the primary model.
      */
     private suspend fun generateWithFallback(inputContent: com.google.ai.client.generativeai.type.Content): String {
-        while (candidateIndex < MODEL_CANDIDATES.size) {
+        for (index in MODEL_CANDIDATES.indices) {
+            val name = MODEL_CANDIDATES[index]
+            val m = buildModel(name)
             try {
-                val response = model!!.generateContent(inputContent)
+                val response = m.generateContent(inputContent)
+                Log.d(TAG, "$name — response received")
                 return response.text ?: ""
             } catch (e: Exception) {
-                val failedModel = MODEL_CANDIDATES[candidateIndex]
-                candidateIndex++
-                if (candidateIndex < MODEL_CANDIDATES.size) {
-                    val nextModel = MODEL_CANDIDATES[candidateIndex]
-                    Log.w(TAG, "$failedModel failed (${e.message}) — trying $nextModel")
-                    model = buildModel(nextModel)
-                } else {
-                    throw e
-                }
+                Log.w(TAG, "$name failed (${e.message})")
+                if (index == MODEL_CANDIDATES.lastIndex) throw e
             }
         }
         throw IllegalStateException("No model candidates remaining")
@@ -160,8 +167,8 @@ class GemmaApiInferenceEngineImpl @Inject constructor(
         modelName = name,
         apiKey = BuildConfig.GEMINI_API_KEY,
         generationConfig = generationConfig {
-            temperature = 0.1f
-            maxOutputTokens = 512
+            temperature = 0.3f
+            maxOutputTokens = 256
         },
         systemInstruction = content { text(SYSTEM_PROMPT) }
     )
@@ -173,8 +180,8 @@ class GemmaApiInferenceEngineImpl @Inject constructor(
 
     private fun parseResponse(rawResponse: String, processingTimeMs: Long): ClassificationResult {
         return try {
-            val jsonStr = extractJson(rawResponse)
-            val parsed = gson.fromJson(jsonStr, GemmaClassificationResponse::class.java)
+            val parsed = parseProse(rawResponse) ?: parseJson(rawResponse)
+                ?: throw IllegalStateException("No parseable classification in response")
             val category = IncidentCategory.fromGemmaLabel(parsed.category)
             val severity = parsed.severity.coerceIn(1, 5)
             val confidence = parsed.confidence.coerceIn(0f, 1f)
@@ -192,6 +199,29 @@ class GemmaApiInferenceEngineImpl @Inject constructor(
             Log.w(TAG, "Failed to parse response: $rawResponse", e)
             ClassificationResult.fallback().copy(rawResponse = rawResponse)
         }
+    }
+
+    private fun parseJson(text: String): GemmaClassificationResponse? {
+        return try {
+            val jsonStr = extractJson(text)
+            val parsed = gson.fromJson(jsonStr, GemmaClassificationResponse::class.java)
+            // Reject the schema example the model sometimes echoes back
+            if (parsed?.category != null && !parsed.category.startsWith("<")) parsed else null
+        } catch (e: Exception) { null }
+    }
+
+    // Fallback: model output bullet-point prose instead of JSON.
+    // Uses the LAST occurrence of each key so reasoning sections are skipped.
+    private fun parseProse(text: String): GemmaClassificationResponse? {
+        val cat = Regex("""(?i)category[`\s]*:\s*[`"]?([a-z][a-z_]*)""")
+            .findAll(text).lastOrNull()?.groupValues?.get(1) ?: return null
+        val sev = Regex("""(?i)severity[`\s]*:\s*[`"]?(\d)""")
+            .findAll(text).lastOrNull()?.groupValues?.get(1)?.toIntOrNull() ?: 3
+        val conf = Regex("""(?i)confidence[`\s]*:\s*[`"]?([01]\.?[0-9]*)""")
+            .findAll(text).lastOrNull()?.groupValues?.get(1)?.toFloatOrNull() ?: 0.5f
+        val reason = Regex("""(?i)reasoning[`\s]*:\s*"?([^\n"]+)""")
+            .findAll(text).lastOrNull()?.groupValues?.get(1)?.trim() ?: ""
+        return GemmaClassificationResponse(cat, sev, conf, reason)
     }
 
     private fun extractJson(text: String): String {

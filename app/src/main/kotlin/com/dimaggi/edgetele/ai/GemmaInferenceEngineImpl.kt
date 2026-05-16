@@ -42,28 +42,34 @@ class GemmaInferenceEngineImpl @Inject constructor(
     companion object {
         private const val TAG = "GemmaEngine"
         private const val MODEL_PATH = "gemma-4-E4B-it.litertlm"
-        private const val MAX_TOKENS = 512
+        // 2048 gives the 4B model enough KV-cache for prompt + output.
+        // The old value of 512 was smaller than the prompt itself, causing truncation.
+        private const val MAX_TOKENS = 2048
 
+        // Compact prompt tuned for the 4B on-device model.
+        // Long prompts exceed the old 512-token budget before the categories were even reached.
+        // Few-shot examples give the small model concrete anchors rather than abstract rules.
         private val SYSTEM_PROMPT = """
-            You are an offline disaster response assistant helping trained field responders.
-            You classify disaster incidents from photos, voice transcripts, and field notes.
-            You are NOT an autonomous decision-maker.
-            All your outputs are DECISION SUPPORT for trained human responders.
+            You are a disaster incident classifier. Read the field report and output ONLY a JSON object.
 
-            Always respond with a single valid JSON object matching this exact schema:
-            {
-              "category": "<one of: flood_damage, structural_damage, injury, contamination, other>",
-              "severity": <integer 1-5>,
-              "confidence": <float 0.0-1.0>,
-              "reasoning": "<brief 1-sentence explanation>"
-            }
+            Categories (pick the single best match):
+            injury        – person physically hurt: broken bone, wound, bleeding, burn, fracture, medical emergency
+            contamination – hazardous substance: chemical spill, nuclear/radioactive material, toxic exposure, biohazard
+            flood_damage  – water flooding: flooded road, submerged building, overflowing river
+            structural_damage – building/infrastructure damage: collapsed roof, cracked wall, downed bridge
+            other         – does not fit any category above
 
-            Severity scale:
-            1 = Minor, no immediate risk
-            2 = Moderate, monitor situation
-            3 = Significant, intervention needed soon
-            4 = Severe, immediate intervention required
-            5 = Critical, life-threatening
+            Examples:
+            "broken leg"          → {"category":"injury","severity":3,"confidence":0.95,"reasoning":"Broken leg is bodily harm."}
+            "chemical spill"      → {"category":"contamination","severity":4,"confidence":0.95,"reasoning":"Chemical spill is a hazardous substance."}
+            "nuclear material"    → {"category":"contamination","severity":5,"confidence":0.95,"reasoning":"Nuclear material is a radiological hazard."}
+            "flooded street"      → {"category":"flood_damage","severity":3,"confidence":0.90,"reasoning":"Flooded street is water inundation."}
+            "collapsed wall"      → {"category":"structural_damage","severity":4,"confidence":0.90,"reasoning":"Collapsed wall is structural damage."}
+
+            Severity: 1=minor 2=moderate 3=significant 4=severe 5=critical
+            Confidence: 0.85-1.0=clear match  0.60-0.84=probable  0.0-0.59=uncertain
+
+            Respond with ONLY the JSON object, nothing else.
         """.trimIndent()
     }
 
@@ -193,8 +199,8 @@ class GemmaInferenceEngineImpl @Inject constructor(
 
     private fun parseResponse(rawResponse: String, processingTimeMs: Long): ClassificationResult {
         return try {
-            val jsonStr = extractJson(rawResponse)
-            val parsed = gson.fromJson(jsonStr, GemmaClassificationResponse::class.java)
+            val parsed = parseProse(rawResponse) ?: parseJson(rawResponse)
+                ?: throw IllegalStateException("No parseable classification in response")
             val category = com.dimaggi.edgetele.data.model.enums.IncidentCategory.fromGemmaLabel(parsed.category)
             val severity = parsed.severity.coerceIn(1, 5)
             val confidence = parsed.confidence.coerceIn(0f, 1f)
@@ -212,6 +218,28 @@ class GemmaInferenceEngineImpl @Inject constructor(
             Log.w(TAG, "Failed to parse Gemma response: $rawResponse", e)
             ClassificationResult.fallback().copy(rawResponse = rawResponse)
         }
+    }
+
+    private fun parseJson(text: String): GemmaClassificationResponse? {
+        return try {
+            val jsonStr = extractJson(text)
+            val parsed = gson.fromJson(jsonStr, GemmaClassificationResponse::class.java)
+            if (parsed?.category != null && !parsed.category.startsWith("<")) parsed else null
+        } catch (e: Exception) { null }
+    }
+
+    // Fallback: model output bullet-point prose instead of JSON.
+    // Uses the LAST occurrence of each key so reasoning sections are skipped.
+    private fun parseProse(text: String): GemmaClassificationResponse? {
+        val cat = Regex("""(?i)category[`\s]*:\s*[`"]?([a-z][a-z_]*)""")
+            .findAll(text).lastOrNull()?.groupValues?.get(1) ?: return null
+        val sev = Regex("""(?i)severity[`\s]*:\s*[`"]?(\d)""")
+            .findAll(text).lastOrNull()?.groupValues?.get(1)?.toIntOrNull() ?: 3
+        val conf = Regex("""(?i)confidence[`\s]*:\s*[`"]?([01]\.?[0-9]*)""")
+            .findAll(text).lastOrNull()?.groupValues?.get(1)?.toFloatOrNull() ?: 0.5f
+        val reason = Regex("""(?i)reasoning[`\s]*:\s*"?([^\n"]+)""")
+            .findAll(text).lastOrNull()?.groupValues?.get(1)?.trim() ?: ""
+        return GemmaClassificationResponse(cat, sev, conf, reason)
     }
 
     private fun extractJson(text: String): String {

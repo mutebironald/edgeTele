@@ -6,6 +6,16 @@ Built for the Gemma 4 Good Hackathon (April 2026). Edge-Tele runs entirely on-de
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/screen1.png" width="270" alt="Home screen — incident list"/>
+  &nbsp;&nbsp;&nbsp;
+  <img src="docs/screenshots/screen2.png" width="270" alt="New Incident screen"/>
+</p>
+
+---
+
 ## What it does
 
 A field responder arrives at a disaster site. They open Edge-Tele, capture a photo and/or record a voice note, and the app:
