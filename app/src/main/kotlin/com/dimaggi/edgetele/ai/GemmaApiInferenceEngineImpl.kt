@@ -169,7 +169,7 @@ class GemmaApiInferenceEngineImpl @Inject constructor(
         apiKey = BuildConfig.GEMINI_API_KEY,
         generationConfig = generationConfig {
             temperature = 0.3f
-            maxOutputTokens = 256
+            maxOutputTokens = 1024
         },
         systemInstruction = content { text(SYSTEM_PROMPT) }
     )
