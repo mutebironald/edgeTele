@@ -2,6 +2,7 @@ package com.dimaggi.edgetele.ui.screens.incident
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -9,6 +10,7 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -45,8 +47,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -144,6 +148,7 @@ fun NewIncidentScreen(
 
     LaunchedEffect(uiState.sttError) {
         uiState.sttError?.let { err ->
+            val isPackMissing = err == SpeechRecognitionManager.SttError.LANGUAGE_PACK_MISSING
             val msg = when (err) {
                 SpeechRecognitionManager.SttError.RECOGNITION_UNAVAILABLE ->
                     "Speech recognition not available on this device"
@@ -151,12 +156,32 @@ fun NewIncidentScreen(
                     "Microphone unavailable — check permissions"
                 SpeechRecognitionManager.SttError.LANGUAGE_NOT_SUPPORTED ->
                     "Language not supported for speech — try English"
+                SpeechRecognitionManager.SttError.LANGUAGE_PACK_MISSING ->
+                    "Speech pack missing. Tap Download → profile photo → Settings → Voice → Offline speech recognition → English"
                 SpeechRecognitionManager.SttError.TIMEOUT ->
                     "No speech detected — tap mic and speak"
                 SpeechRecognitionManager.SttError.RECOGNITION_FAILED ->
-                    "Speech recognition failed — try again"
+                    "Speech recognition failed — check internet connection"
             }
-            snackbarHostState.showSnackbar(msg)
+            val result = snackbarHostState.showSnackbar(
+                message = msg,
+                actionLabel = if (isPackMissing) "Download" else null,
+                duration = if (isPackMissing) SnackbarDuration.Long else SnackbarDuration.Short
+            )
+            if (isPackMissing && result == SnackbarResult.ActionPerformed) {
+                // AiAi language pack settings — look for "Speech" or "Language" section
+                val aiaiSettings = Intent().apply {
+                    component = android.content.ComponentName(
+                        "com.google.android.as",
+                        "com.google.android.apps.miphone.aiai.settings.ui.user.AsiSettingsActivity"
+                    )
+                }
+                val intent = if (aiaiSettings.resolveActivity(context.packageManager) != null)
+                    aiaiSettings
+                else
+                    Intent(Settings.ACTION_VOICE_INPUT_SETTINGS)
+                context.startActivity(intent)
+            }
             viewModel.clearSttError()
         }
     }

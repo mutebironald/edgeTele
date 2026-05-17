@@ -1,7 +1,9 @@
 package com.dimaggi.edgetele.audio
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -71,7 +73,7 @@ class SpeechRecognitionManager @Inject constructor(
             // Always tear down any previous recognizer before starting a new one.
             destroyRecognizerInternal()
 
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
+            speechRecognizer = createBestRecognizer().apply {
                 setRecognitionListener(recognitionListener)
             }
 
@@ -83,11 +85,10 @@ class SpeechRecognitionManager @Inject constructor(
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE, resolveLocale(language))
                 putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, MAX_RESULTS)
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
                 putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
-                // Give the user more time to speak before the session times out.
-                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 4000L)
-                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 3000L)
+                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 3000L)
+                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 8000L)
+                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 6000L)
             }
 
             speechRecognizer?.startListening(intent)
@@ -124,6 +125,34 @@ class SpeechRecognitionManager @Inject constructor(
         speechRecognizer?.destroy()
         speechRecognizer = null
         _isListening.value = false
+    }
+
+    /**
+     * Pick the best available SpeechRecognizer, avoiding TTS services that register
+     * as RecognitionService but can't do STT (e.g. GoogleTTSRecognitionService).
+     * Prefers AiAiSpeechRecognitionService which supports both network and offline modes.
+     */
+    private fun createBestRecognizer(): SpeechRecognizer {
+        val pm = context.packageManager
+        val candidates = pm.queryIntentServices(
+            Intent("android.speech.RecognitionService"),
+            0
+        )
+        val preferred = candidates.firstOrNull { info ->
+            val name = info.serviceInfo.name
+            // AiAi supports network + offline; exclude TTS services
+            "aiai" in name.lowercase() || "speechrecognition" in name.lowercase()
+        }?.serviceInfo
+
+        return if (preferred != null) {
+            Log.d(TAG, "Using recognizer: ${preferred.packageName}/${preferred.name}")
+            SpeechRecognizer.createSpeechRecognizer(
+                context,
+                ComponentName(preferred.packageName, preferred.name)
+            )
+        } else {
+            SpeechRecognizer.createSpeechRecognizer(context)
+        }
     }
 
     /**
@@ -167,14 +196,12 @@ class SpeechRecognitionManager @Inject constructor(
                 SpeechRecognizer.ERROR_AUDIO                  -> SttError.MICROPHONE_UNAVAILABLE
                 SpeechRecognizer.ERROR_SPEECH_TIMEOUT,
                 SpeechRecognizer.ERROR_NO_MATCH               -> SttError.TIMEOUT
+                SpeechRecognizer.ERROR_NETWORK,
+                SpeechRecognizer.ERROR_NETWORK_TIMEOUT        -> SttError.RECOGNITION_FAILED
+                13                                            -> SttError.LANGUAGE_PACK_MISSING
                 else                                          -> SttError.RECOGNITION_FAILED
             }
             Log.w(TAG, "STT error: $sttError (code=$error)")
-            // isRecognitionAvailable() returns true on some devices even when the STT
-            // service is broken. Mark unavailable after first hard failure so the UI hides the mic.
-            if (sttError == SttError.RECOGNITION_FAILED) {
-                _isAvailable.value = false
-            }
             sendEvent(SttEvent.Error(sttError))
         }
 
@@ -214,6 +241,7 @@ class SpeechRecognitionManager @Inject constructor(
 
     enum class SttError {
         LANGUAGE_NOT_SUPPORTED,
+        LANGUAGE_PACK_MISSING,
         MICROPHONE_UNAVAILABLE,
         TIMEOUT,
         RECOGNITION_FAILED,
