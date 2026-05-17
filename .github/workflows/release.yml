@@ -49,12 +49,13 @@ jobs:
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "edge-tele ${{ github.ref_name }}"
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: "edge-tele ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
           body: |
-            ## edge-tele ${{ github.ref_name }}
+            ## edge-tele ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
 
             Offline Gemma AI copilot for disaster field workers.
 
             **Install:** download the APK, enable *Install from unknown sources* on your device, then open the file.
           files: app/build/outputs/apk/release/*.apk
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          prerelease: ${{ contains(github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name, '-') }}
