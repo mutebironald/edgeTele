@@ -150,7 +150,8 @@ class GemmaApiInferenceEngineImpl @Inject constructor(
     private suspend fun generateWithFallback(inputContent: com.google.ai.client.generativeai.type.Content): String {
         for (index in MODEL_CANDIDATES.indices) {
             val name = MODEL_CANDIDATES[index]
-            val m = buildModel(name)
+            // Reuse the preloaded model for the primary; build fresh only for fallbacks.
+            val m = if (index == 0) model ?: buildModel(name) else buildModel(name)
             try {
                 val response = m.generateContent(inputContent)
                 Log.d(TAG, "$name — response received")

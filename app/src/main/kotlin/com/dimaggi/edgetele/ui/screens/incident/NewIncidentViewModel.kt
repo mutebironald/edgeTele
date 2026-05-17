@@ -39,6 +39,7 @@ class NewIncidentViewModel @Inject constructor(
     val isSttAvailable: StateFlow<Boolean> = speechManager.isAvailable
 
     init {
+        viewModelScope.launch { gemmaEngine.preload() }
         observeSttEvents()
     }
 
