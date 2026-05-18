@@ -259,11 +259,11 @@ fun NewIncidentScreen(
             Button(
                 onClick = { viewModel.classifyIncident(responderID) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isInferring && (uiState.photoBytes != null
+                enabled = !uiState.isClassifying && (uiState.photoBytes != null
                         || uiState.transcript.isNotBlank()
                         || uiState.notes.isNotBlank())
             ) {
-                if (isInferring) {
+                if (uiState.isClassifying) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
                         color = Color.White,
